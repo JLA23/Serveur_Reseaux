@@ -15,6 +15,7 @@ public class Rdv {
 	private byte[] buffer = null; 
 	private DatagramSocket dgSocket;
 	private String uuid = null;
+	
 	public Rdv() throws IOException {
 		dgSocket = new DatagramSocket(_pSrv);
 		peers = new Hashtable<String, PeerInfo>();
@@ -23,16 +24,15 @@ public class Rdv {
 	private void serve() throws IOException {    	
 		while (true) {
 			DatagramPacket dgPacket = receive();
-
 			String msg = new String(dgPacket.getData(), dgPacket.getOffset(), dgPacket.getLength());
 			InetAddress address = dgPacket.getAddress();
 			int port = dgPacket.getPort();
 			String answer = "";
 
-			if ( msg.equals("RGTR\n") ) { // enlever le \n après avoir testé avec nc
-				send(address, port, "Bienvenue !\n");
+			if ( msg.equals("RGTR") ) { // enlever le \n après avoir testé avec nc
 				answer = register(address, port);
-				send(address, port, answer);
+				send(address, port, "Bienvenue ! \n" + answer);
+				//System.out.println(peers.size());
 				if(peers.size() > 1){
 					afficherUtilisateurs(address, port);
 				}

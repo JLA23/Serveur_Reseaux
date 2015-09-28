@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class Client {
 	
-	private static int _dgLength = 50;
+	private static int _dgLength = 5000;
 	private DatagramSocket dgSocket;
 	private DatagramPacket dgPacket;
 	
@@ -33,23 +33,27 @@ public class Client {
 	}
 
 	public static void main(String[] args) throws IOException {
-		/*
+		
+		Client client = new Client();
 		String msg = "RGTR";
 		client.send(msg, InetAddress.getByName(args[0]), 5001);
 		String uuid = client.receive();
 		System.out.println(uuid);
-		
-		String msg2 = "RTRV:" + uuid.substring(3, uuid.length());
+		System.out.println(client.receive());
+		String msg2 = uuid.substring(uuid.indexOf("OK:")+3, uuid.indexOf("OK:")+39);
+		System.out.println(msg2);
+		/*String msg2 = "RTRV:" + uuid.substring(3, uuid.length());
 		client.send(msg2, InetAddress.getByName(args[0]), 5001);
 		String nb = client.receive();
+		System.out.println(nb);
 		_dgLength = Integer.parseInt(nb.substring(3, nb.length()));
 		System.out.println(msg2);
 		
 		String msg3 = "QUIT:" + uuid.substring(3, uuid.length());
 		client.send(msg3, InetAddress.getByName(args[0]), 5001);
 		String nb3 = client.receive();
-		System.out.println(msg3);
-		*/
+		System.out.println(msg3);*/
+		
 	}
 
 }
