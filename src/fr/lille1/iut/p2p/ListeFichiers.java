@@ -20,7 +20,7 @@ public class ListeFichiers {
 	
 	private void ListerFichiers(){
 		System.out.println("Bonjours");
-		File repertoire = new File("lille1.iut/p2p/data");
+		File repertoire = new File("fr/lille1/iut/p2p/data");
 		
 		System.out.println(repertoire.isDirectory() + "");
 		if (repertoire.isDirectory()){

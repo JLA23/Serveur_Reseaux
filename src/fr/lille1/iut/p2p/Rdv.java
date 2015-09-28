@@ -27,11 +27,12 @@ public class Rdv {
 			String msg = new String(dgPacket.getData(), dgPacket.getOffset(), dgPacket.getLength());
 			InetAddress address = dgPacket.getAddress();
 			int port = dgPacket.getPort();
-			String answer = null;
+			String answer = "";
 
 			if ( msg.equals("RGTR\n") ) { // enlever le \n après avoir testé avec nc
 				send(address, port, "Bienvenue !\n");
 				answer = register(address, port);
+				send(address, port, answer);
 				if(peers.size() > 1){
 					afficherUtilisateurs(address, port);
 				}
@@ -40,11 +41,9 @@ public class Rdv {
 				if(msg.equals("LIST\n")){
 					ListeFichiers list = new ListeFichiers(uuid, address, port);
 					String[] tab = list.getTab();
-					String message = "";
 					for(int i = 0; i < tab.length; i++){
-						message = i + " : " + tab[i] + "\n";
+						answer = answer + i + " : " + tab[i] + "\n";
 					}
-					send(address, port, message);
 				}
 				else {
 					String[] words = msg.split(":");
@@ -147,17 +146,17 @@ public class Rdv {
 	private void afficherUtilisateurs(InetAddress address, int port) throws IOException{
 		StringBuilder sb = new StringBuilder();
 		Enumeration<PeerInfo> p = peers.elements();
-		int i = 0;
+		int i = peers.size();
 		while ( p.hasMoreElements() ) {
 			PeerInfo peer = p.nextElement();
 			if ( ! peer.getUUID().toString().equals(uuid) ) {
 				sb.append(i+" :");
 				sb.append(peer.toString()); 
 				sb.append("\n");
-				i++;
+				i--;
 			}
 			else{
-				i++;
+				i--;
 			}
 		}
 		send(address, port, sb.toString());
