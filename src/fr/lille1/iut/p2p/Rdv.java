@@ -146,20 +146,14 @@ public class Rdv {
 	private void afficherUtilisateurs(InetAddress address, int port) throws IOException{
 		StringBuilder sb = new StringBuilder();
 		Enumeration<PeerInfo> p = peers.elements();
-		int i = peers.size();
 		while ( p.hasMoreElements() ) {
 			PeerInfo peer = p.nextElement();
 			if ( ! peer.getUUID().toString().equals(uuid) ) {
-				sb.append(i+" :");
 				sb.append(peer.toString()); 
 				sb.append("\n");
-				i--;
-			}
-			else{
-				i--;
 			}
 		}
-		send(address, port, sb.toString());
+		send(address, port, "Ces UUID sont deja connecte : \n" + sb.toString());
 	}
 
 	public static void main(String[] args) throws IOException {
