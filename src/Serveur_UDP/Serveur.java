@@ -10,7 +10,7 @@ import Objects.PeerInfo;
 
 public class Serveur {
 	private static final  int _pSrv = 5001;
-	private static final int _bfLength = 41;
+	private static final int _bfLength = 2096;
 	private Hashtable<String, PeerInfo> peers;
 	private byte[] buffer = null; 
 	private DatagramSocket dgSocket;
@@ -50,6 +50,11 @@ public class Serveur {
 				case("INFO"):
 					int ports = peers.get(words[1]).getPortTCP();
 					String adresse = peers.get(words[1]).getAddress().toString();
+					if(adresse.equals("/127.0.0.1")){
+						adresse = InetAddress.getLocalHost().toString();
+						adresse = adresse.substring(adresse.length() - 14, adresse.length());
+						System.out.println(adresse);
+					}
 					send(address, port, "NPA:"+ports+"-"+adresse);
 					break;
 				case("RGTR"):

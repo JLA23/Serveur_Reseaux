@@ -86,6 +86,7 @@ public class Client extends Thread{
 			msg = msg + tab[i] + "-";
 		}
 		msg = msg + tab[tab.length-1];
+		System.out.println(msg);
 		this.send(msg,address, 5001);
 		this.pause();
 	}

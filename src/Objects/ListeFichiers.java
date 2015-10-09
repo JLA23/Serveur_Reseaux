@@ -25,6 +25,7 @@ public class ListeFichiers {
 		listFile = new ArrayList<String>();
 		for(int i = 0; i < tab.length; i ++){
 			listFile.add(tab[i]);
+			System.out.println(tab[i]);
 		}
 	}
 	
