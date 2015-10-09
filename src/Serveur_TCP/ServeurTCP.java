@@ -1,9 +1,11 @@
 package Serveur_TCP;
 
 import java.io.BufferedReader;
-import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -44,19 +46,20 @@ public class ServeurTCP extends Thread{
 	
 	private void realiseService(Socket unClient) {
 		try {
-	
 			envoi = new PrintWriter(unClient.getOutputStream(), true);
 			
 			reception = new BufferedReader(
                     new InputStreamReader(unClient.getInputStream()));
 	
 			String message = reception.readLine();
+			System.out.println(message);
+			System.out.println(message.contains("FILE:"));
 			if(message.contains("FILE:")){
 				String [] words = message.split(":");
-				upload(words[1].trim());
-			}
-			else{
-				
+				System.out.println("avant OK");
+				envoi.println("OK");
+				System.out.println("apres ok");
+				upload(words[1].trim(), unClient);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -64,10 +67,17 @@ public class ServeurTCP extends Thread{
 		}
 	}
 	
-	private void upload(String file){
+	private void upload(String file, Socket unClient) throws IOException{
 		if(list.getListFile().contains(file)){
-			File fichier = new File(list.getAddress() + "/" + file);
-			envoi.println(fichier);
+	        byte buf[] = new byte[2048];
+	    	OutputStream out = unClient.getOutputStream();
+	    	InputStream in = new FileInputStream(list.getAddress() + "/" + file);
+	        int n;
+	        while((n=in.read(buf))!=-1){
+	            out.write(buf,0,n);
+	        }
+	            in.close();
+	            out.close();
 		}
 	}
 }

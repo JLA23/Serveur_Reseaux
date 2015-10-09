@@ -1,12 +1,12 @@
 package Client_TCP;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -51,29 +51,31 @@ public class ClientTCP{
     
     public void telecharger(String file, String destination) throws NumberFormatException, IOException{
     	String message = "FILE:"+file;
+    	System.out.println(message);
     	envoi.println(message);
-    	String reponse ="";
-    	while(reponse.equals("") || reponse.equals("Ce fichier n existe pas")){
-    		try{
-    			reponse = reception.readLine();
-    			System.out.println(reponse);
-    		}
-    		catch(IOException e){
-    			e.printStackTrace();
-    			System.exit(1);
-    		}
+    	System.out.println("après envoie");
+    	String reponse = reception.readLine();
+    	System.out.println(reponse);
+    	if(reponse.equals("Ce fichier n existe pas")){
+    		System.out.println("Aucun fichier");
     	}
-    	System.out.println("Telechargement en cours");
-    	DataInputStream in = new DataInputStream(clientSocket.getInputStream());
-    	int size = Integer.parseInt(reception.readLine().split(": ")[1]);
-    	byte[] item = new byte[size];
-    	for(int i = 0; i < size; i++)
-    	    item[i] = in.readByte();
-    	FileOutputStream requestedfile = new FileOutputStream(new File(destination+"/"+file));
-    	BufferedOutputStream bos = new BufferedOutputStream(requestedfile);
-    	bos.write(item);
-    	bos.close();
-     	in.close();
-    }
-
+    	else if(reponse.equals("OK")){
+    		System.out.println("Telechargement en cours");
+    	      File fichier = new File(destination + "/" + file);
+  	        if(!fichier.exists()){
+  	        	fichier.createNewFile();
+  	        }
+    		byte buf[] = new byte[2048];
+    		OutputStream out = new FileOutputStream(fichier);
+    		InputStream in = clientSocket.getInputStream();
+    		int n;
+    		while((n=in.read(buf))!=-1){
+    			out.write(buf,0,n);
+    		}
+    		in.close();
+    		out.close();
+    		System.out.println("Telechargement terminer");
+    	}
+	}
 }
+
