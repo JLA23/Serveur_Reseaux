@@ -18,7 +18,6 @@ public class ClientTCP{
     
     public ClientTCP(String host, int port) {
 	try {
-		System.out.println("Host : " + host + " - Port : " + port);
 	    clientSocket = new Socket(host, port);
 	} catch (UnknownHostException e) {
 	    e.printStackTrace();
@@ -61,10 +60,10 @@ public class ClientTCP{
     	}
     	else if(reponse.equals("OK")){
     		System.out.println("Telechargement en cours");
-    	      File fichier = new File(destination + "/" + file);
-  	        if(!fichier.exists()){
+    	    File fichier = new File(destination + "/" + file);
+  	        /*if(!fichier.exists()){
   	        	fichier.createNewFile();
-  	        }
+  	        }*/
     		byte buf[] = new byte[2048];
     		OutputStream out = new FileOutputStream(fichier);
     		InputStream in = clientSocket.getInputStream();
@@ -75,6 +74,7 @@ public class ClientTCP{
     		in.close();
     		out.close();
     		System.out.println("Telechargement terminer");
+    		
     	}
 	}
 }

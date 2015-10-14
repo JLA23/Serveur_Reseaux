@@ -1,31 +1,31 @@
 package Objects;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class ListeFichiers {
 
 	private String[] tab;
 	private ArrayList<String> listFile;
 	private String address;
+	private Scanner sc;
 	
-	public ListeFichiers(String address){
+	public ListeFichiers(String address, Scanner sc){
 		this.address = address;
+		this.sc = sc;
 	}
 	
 	public void ListerFichiers(){
 		File repertoire = new File(address);
-		if (repertoire.isDirectory()){
-			tab = repertoire.list();
-			if (tab == null){
-				System.err.println("Erreur : Aucun fichiers");
-			}
-		}else{
-			System.err.println("Erreur : Aucun repertoire");
+		while(!repertoire.isDirectory()){
+			System.out.println("Aucun repertoire, le chemin d'accée n'existe pas");
+			address = sc.nextLine();
+			repertoire = new File(address);
 		}
+		tab = repertoire.list();
 		listFile = new ArrayList<String>();
-		for(int i = 0; i < tab.length; i ++){
-			listFile.add(tab[i]);
-			System.out.println(tab[i]);
+		if (tab == null){
+			System.out.println("Aucun fichiers dans votre répertoire");
 		}
 	}
 	

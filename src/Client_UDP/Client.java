@@ -4,6 +4,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import Client_TCP.ClientTCP;
@@ -17,8 +18,10 @@ public class Client extends Thread{
 	private boolean quit;
 	private String pseudo;
 	private ListeFichiers list;
+	private String address;
 	
 	public Client() throws SocketException{
+		System.setProperty( "file.encoding", "UTF-8" );
 		dgSocket = new DatagramSocket();
 		this.quit = false;
 	}
@@ -59,41 +62,70 @@ public class Client extends Thread{
 		this.dgPacket = dgPacket;
 	}
 	
+	public void verifOk() throws UnknownHostException, IOException{
+		send(pseudo, InetAddress.getByName(address), 5001);
+	}
+	private boolean charSpeciaux(String pseudo){
+		boolean containt = false;
+		String cs = "[^\\wàâäÄÀÂéèêëÈÊËìîïÌÏÎòöôÒÖÔùüûÙÜÛç!#$€%&'`(),;:/@...]";
+		for(int i = 0; i < cs.length(); i++){
+			if(pseudo.indexOf(cs.charAt(i)) != -1){
+				containt = true;
+				break;
+			}			
+		}
+		return containt;
+	}
+	
 	private void enregistrer(Scanner sc, Notification notif, InetAddress address) throws IOException, InterruptedException{
 		System.out.println("Bonjours ! Veuillez donner un pseudo : ");
 		String msg = "RGTR";
 		pseudo = sc.nextLine();
-		System.out.println("");
+		while(charSpeciaux(pseudo)){
+			System.out.println("Votre pseudo contient des caractere interdit. \n Veuillez en choisir un autre :");
+			pseudo = sc.nextLine();
+		}
 		msg = msg + ":" + pseudo;
+		this.send(msg.length()+"", address, 5001);
 		this.send(msg, address, 5001);
 		this.pause();	
 		while(notif.getReponse().equals("Impossible de se connecter, choissisez un autre Pseudo :")){
 			msg = "RGTR:" + sc.nextLine();
-			System.out.println("");
+			this.send(msg.length()+"", address, 5001);
 			this.send(msg, address, 5001);
 			this.pause();	
 		}
 	}
 	
-	private void CDP(String msg, Scanner sc, Notification notif, InetAddress address) throws InterruptedException, IOException{
-		msg = msg + ":"+ pseudo;
+	private void CDP(Scanner sc, InetAddress address) throws InterruptedException, IOException{
+		String msg = "CDP:"+ pseudo;
 		System.out.println("Ou se situe votre dossier de partage : ");
-		list = new ListeFichiers(sc.nextLine());
+		list = new ListeFichiers(sc.nextLine(), sc);
 		list.ListerFichiers();
+		envoieListFichier(this, msg, address);
+	}
+	
+	private void envoieListFichier(Client client, String msg, InetAddress address) throws InterruptedException, IOException{
 		String [] tab = list.getTab();
 		msg = msg + ":";
-		for(int i = 0 ; i < tab.length - 1; i++){
-			msg = msg + tab[i] + "-";
+		if(tab.length != 0){
+			for(int i = 0 ; i < tab.length - 1; i++){
+				msg = msg + tab[i] + "-";
+			}
+			msg = msg + tab[tab.length-1];
 		}
-		msg = msg + tab[tab.length-1];
-		System.out.println(msg);
-		this.send(msg,address, 5001);
-		this.pause();
+		else{
+			msg = msg + "null";
+		}
+		client.send(msg.length()+"", address, 5001);
+		client.send(msg,address, 5001);
+		client.pause();
 	}
 	
 	private void list(String msg, Notification notif, InetAddress address) throws IOException, InterruptedException{
 		String[] words = msg.split(":");
 		if(words.length == 2){
+			this.send(msg.length()+"", address, 5001);
 			this.send(msg,address, 5001);
 			this.pause();
 		}
@@ -104,6 +136,7 @@ public class Client extends Thread{
 	
 	private void autres(String msg, Notification notif, InetAddress address) throws IOException, InterruptedException{
 		msg = msg + ":" + pseudo;
+		this.send(msg.length()+"", address, 5001);
 		this.send(msg, address, 5001);
 		this.pause();
 	}
@@ -111,55 +144,68 @@ public class Client extends Thread{
 	private void quit(String msg, Notification notif, InetAddress address) throws IOException, InterruptedException{
 		msg = msg + ":" + pseudo;
 		quit = true;
+		this.send(msg.length()+"", address, 5001);
 		this.send(msg, address, 5001);
 		this.pause();
 	}
 	
 	private void recup(String msg, Notification notif, InetAddress address) throws IOException, InterruptedException{
 		String [] words = msg.split(":");
-		this.send("INFO:" + words[1], address, 5001);
+		String message = "INFO:" + words[1];
+		this.send(message.length()+"", address, 5001);
+		this.send(message, address, 5001);
 		this.pause();
 		String reponse = notif.getReponse();
 		String [] words2 = reponse.split("-");
-		System.out.println(words2[1] + " " + words2[0]);
 		ClientTCP cTCP = new ClientTCP(words2[1].substring(1), Integer.parseInt(words2[0]));
-		System.out.println(words[2] + " " + list.getAddress());
 		cTCP.telecharger(words[2], list.getAddress());
+		list.ListerFichiers();
+		envoieListFichier(this, "CDP:"+pseudo, address);
+		
 	}
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		Client client = new Client();
+		client.setAddress(args[0]);
 		Notification notif = new Notification(client);
 		Scanner sc = new Scanner(System.in);
 		notif.start();
 		client.enregistrer(sc, notif, InetAddress.getByName(args[0]));
+		client.pause();
 		String reponse = notif.getReponse();
+		client.CDP(sc, InetAddress.getByName(args[0]));
 		if(reponse.contains(":")){
 			String [] words = reponse.split(":");
-			client.CDP("CDP", sc, notif, InetAddress.getByName(args[0]));
-			System.out.println("Serveur TCP n est pas lance");
-			System.out.println(words[2].substring(1,6));
 			ServeurTCP serverT = new ServeurTCP(Integer.parseInt(words[2].substring(1,6))+1, client.getList());
-			System.out.println("Serveur TCP en cours de lancement");
 			serverT.start();
 			System.out.println("Serveur TCP lance");
+			while(client.getQuit() == false){
+				String msg = sc.nextLine();
+				if(msg.contains("LIST:")){
+					client.list(msg, notif, InetAddress.getByName(args[0]));
+				}
+				else if(msg.equals("QUIT")){
+					client.quit(msg, notif, InetAddress.getByName(args[0]));
+				}
+				else if(msg.contains("RECUP:")){
+					client.recup(msg, notif, InetAddress.getByName(args[0]));
+				}
+				else{
+					client.autres(msg, notif, InetAddress.getByName(args[0]));
+				}
+			}
 		}
-		while(client.getQuit() == false){
-			String msg = sc.nextLine();
-	        System.out.println("");
-	        if(msg.contains("LIST:")){
-				client.list(msg, notif, InetAddress.getByName(args[0]));
-			}
-			else if(msg.equals("QUIT")){
-				client.quit(msg, notif, InetAddress.getByName(args[0]));
-			}
-			else if(msg.contains("RECUP:")){
-				client.recup(msg, notif, InetAddress.getByName(args[0]));
-			}
-			else{
-				client.autres(msg, notif, InetAddress.getByName(args[0]));
-			}
+		else{
+			System.err.println("Erreur du serveur");
 		}
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 }
 

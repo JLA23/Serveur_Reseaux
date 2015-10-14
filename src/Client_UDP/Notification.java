@@ -2,6 +2,7 @@ package Client_UDP;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.UnknownHostException;
 
 public class Notification extends Thread {
 	
@@ -9,6 +10,7 @@ public class Notification extends Thread {
 	private static int _dgLength = 5000;
 	private DatagramSocket dgSocket;
 	private DatagramPacket dgPacket;
+	private Client client;
 	
 	private String reponse;
 
@@ -16,6 +18,7 @@ public class Notification extends Thread {
 		this.dgPacket = client.getDgPacket();
 		this.dgSocket = client.getDgSocket();
 		this.reponse = "";
+		this.client = client;
 	}
 	
 	public void run() {
@@ -28,15 +31,25 @@ public class Notification extends Thread {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			reponse = new String(dgPacket.getData(), dgPacket.getOffset(), dgPacket.getLength());
-			if(reponse.equals("Vous etes deconnecte")){
+			String msg = new String(dgPacket.getData(), dgPacket.getOffset(), dgPacket.getLength());
+			if(msg.equals("Vous etes deconnecte")){
 				exit = true;
 			}
-			else if(!reponse.contains("NPA")){
-				System.out.println(reponse);
+			else if(!msg.contains("NPA")){
+				reponse = msg;
+				System.out.println(msg);
+			}
+			else if(msg.equals("NPA:Verif")){
+				try {
+					client.verifOk();
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 			else{
-				reponse = reponse.split(":")[1];
+				reponse = msg.split(":")[1];
 			}
 		}
 	}
