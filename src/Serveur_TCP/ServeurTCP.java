@@ -18,7 +18,11 @@ public class ServeurTCP extends Thread{
 	BufferedReader reception = null;
 	ListeFichiers list;
 	
-	
+	/**
+	 * Initialise le serveur TCP
+	 * @param port
+	 * @param list
+	 */
 	public ServeurTCP(int port, ListeFichiers list) {
 		try {
 			serveurSocket = new ServerSocket(port);
@@ -29,6 +33,9 @@ public class ServeurTCP extends Thread{
 		this.list = list;
 	}
 	
+	/**
+	 * Lance le serveur
+	 */
 	public void run() {
 		Socket unClient = null;
 		
@@ -44,6 +51,10 @@ public class ServeurTCP extends Thread{
 		}
 	}
 	
+	/**
+	 * Les service que le serveur TCP propose
+	 * @param unClient
+	 */
 	private void realiseService(Socket unClient) {
 		try {
 			envoi = new PrintWriter(unClient.getOutputStream(), true);
@@ -66,7 +77,12 @@ public class ServeurTCP extends Thread{
 			System.exit(1);
 		}
 	}
-	
+	/**
+	 * Envoie un fichier demander à un client
+	 * @param file
+	 * @param unClient
+	 * @throws IOException
+	 */
 	private void upload(String file, Socket unClient) throws IOException{
 		if(list.getListFile().contains(file)){
 	        byte buf[] = new byte[2048];
