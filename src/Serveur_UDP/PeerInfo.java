@@ -12,6 +12,12 @@ public class PeerInfo {
 	private String pseudo;
 	private String[] listeFichiers;
 	
+	/**
+	 * Initialise les informations d'un Peer
+	 * @param address
+	 * @param port
+	 * @param pseudo
+	 */
 	public PeerInfo(InetAddress address, int port, String pseudo) {
 		this.uuid = UUID.randomUUID();
 		this.address = address;
@@ -21,37 +27,51 @@ public class PeerInfo {
 		this.listeFichiers = null;
 	}
 	
+	/**
+	 * Recupere le port TCP
+	 * @return int
+	 */
 	public int getPortTCP() {
 		return portTCP;
 	}
-
+	
+	/**
+	 * Modifie port TCP
+	 * @param portTCP
+	 */
 	public void setPortTCP(int portTCP) {
 		this.portTCP = portTCP;
 	}
-
+	
+	/**
+	 * Retourne la liste de fichier
+	 * @return String []
+	 */
 	public String[] getListeFichiers(){
 		return listeFichiers;
 	}
+	
+	/**
+	 * Modifie Liste de fichiers
+	 * @param listeFichiers
+	 */
 	
 	public void setListeFichier(String [] listeFichiers){
 		this.listeFichiers = listeFichiers;
 	}
 	
+	/**
+	 * Retourne pseudo
+	 * @return
+	 */
 	public String getPseudo(){
 		return pseudo;
 	}
 	
-	public void setPseudo(String pseudo){
-		this.pseudo = pseudo;
-	}
-
 	public InetAddress getAddress() {
 		return address;
 	}
 
-	public void setAddress(InetAddress address) {
-		this.address = address;
-	}
 
 	public int getPort() {
 		return port;

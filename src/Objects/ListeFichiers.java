@@ -37,26 +37,50 @@ public class ListeFichiers {
 		}
 	}
 	
+	/**
+	 * Retourne la liste des fichier (Pour TCP)
+	 * @return ArrayList<String>
+	 */
 	public ArrayList<String> getListFile() {
 		return listFile;
 	}
-
+	
+	/**
+	 * Modifie la liste des fichiers (Pour TCP)
+	 * @param listFile
+	 */
 	public void setListFile(ArrayList<String> listFile) {
 		this.listFile = listFile;
 	}
-
+	
+	/**
+	 * Retourne la liste des fichiers (UDP)
+	 * @return String[]
+	 */
 	public String[] getTab() {
 		return tab;
 	}
-
+	
+	/**
+	 * Modifie la lsite des fichier (UDP)
+	 * @param tab
+	 */
 	public void setTab(String[] tab) {
 		this.tab = tab;
 	}
 	
+	/**
+	 * Retourne l'adresse du dossier
+	 * @return String
+	 */
 	public String getAddress(){
 		return address;
 	}
 	
+	/**
+	 * Modifie l'adresse du dossier
+	 * @param address
+	 */
 	public void setAddress(String address){
 		this.address = address;
 	}
