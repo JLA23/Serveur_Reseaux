@@ -16,6 +16,11 @@ public class ClientTCP{
     private PrintWriter envoi = null;
     private BufferedReader reception = null;
     
+    /**
+     * Initialise ClientTCP avec un clientSocket
+     * @param host
+     * @param port
+     */
     public ClientTCP(String host, int port) {
 	try {
 	    clientSocket = new Socket(host, port);
@@ -36,6 +41,11 @@ public class ClientTCP{
 	}
     }
 	   
+    /**
+     * Envoie un message au serveur
+     * @param message
+     * @return
+     */
     public String envoyer(String message) {
 	    envoi.println(message);
 		    
@@ -48,6 +58,13 @@ public class ClientTCP{
 		    return null;
 	}
     
+    /**
+     * Permet de faire une copie de fichier à partir d'une destination
+     * @param file
+     * @param destination
+     * @throws NumberFormatException
+     * @throws IOException
+     */
     public void telecharger(String file, String destination) throws NumberFormatException, IOException{
     	String message = "FILE:"+file;
     	System.out.println(message);
