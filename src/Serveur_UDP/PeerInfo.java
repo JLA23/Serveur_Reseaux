@@ -68,23 +68,33 @@ public class PeerInfo {
 		return pseudo;
 	}
 	
+	/**
+	 * Retourne une adresse
+	 * @return InetAddress
+	 */
 	public InetAddress getAddress() {
 		return address;
 	}
 
-
+	/**
+	 * Retourne le port
+	 * @return int
+	 */
 	public int getPort() {
 		return port;
 	}
-
-	public void setPort(int port) {
-		this.port = port;
-	}
-
+	
+	/**
+	 * Retourne l'UUID
+	 * @return UUID
+	 */
 	public UUID getUUID() {
 		return uuid;
 	}
-
+	
+	/**
+	 * Affiche l'integralite des informations d'un utilsateur en String
+	 */
 	@Override
 	public String toString() {
 		return pseudo + " - UUID : " + uuid + "\n  Adresse : " + address + "\n  Port : " + port + "\n";
