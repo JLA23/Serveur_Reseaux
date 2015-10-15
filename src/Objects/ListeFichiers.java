@@ -10,11 +10,19 @@ public class ListeFichiers {
 	private String address;
 	private Scanner sc;
 	
+	/**
+	 * Initialise les informations des fichiers du dossier de partage
+	 * @param address
+	 * @param sc
+	 */
 	public ListeFichiers(String address, Scanner sc){
 		this.address = address;
 		this.sc = sc;
 	}
 	
+	/**
+	 * Liste les fichier contenu dans le dossier de partage
+	 */
 	public void ListerFichiers(){
 		File repertoire = new File(address);
 		while(!repertoire.isDirectory()){
