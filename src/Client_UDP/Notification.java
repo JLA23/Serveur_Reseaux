@@ -15,7 +15,7 @@ public class Notification extends Thread {
 	private String reponse;
 
 	/**
-	 * Initialise Notification() avec les methodes de client
+	 * Initialise Notification avec les methodes de client
 	 * @param client
 	 */
 	public Notification(Client client){
