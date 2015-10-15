@@ -14,6 +14,10 @@ public class Notification extends Thread {
 	
 	private String reponse;
 
+	/**
+	 * Initialise Notification() avec les methodes de client
+	 * @param client
+	 */
 	public Notification(Client client){
 		this.dgPacket = client.getDgPacket();
 		this.dgSocket = client.getDgSocket();
@@ -21,6 +25,9 @@ public class Notification extends Thread {
 		this.client = client;
 	}
 	
+	/**
+	 * Surveille les notifications envoyee par le serveur
+	 */
 	public void run() {
 		this.exit = false;
 		while(exit == false){
@@ -53,7 +60,11 @@ public class Notification extends Thread {
 			}
 		}
 	}
-		
+	
+	/**
+	 * Recupere la valeur de reponse
+	 * @return
+	 */
 	public String getReponse(){
 		return reponse;
 	}

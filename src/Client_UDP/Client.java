@@ -13,6 +13,7 @@ import Serveur_TCP.ServeurTCP;
 
 public class Client extends Thread{
 	
+	
 	private DatagramSocket dgSocket;
 	private DatagramPacket dgPacket;
 	private boolean quit;
@@ -20,12 +21,22 @@ public class Client extends Thread{
 	private ListeFichiers list;
 	private String address;
 	
+	/**
+	 * Initialise Client() avec un dgSocket
+	 * @throws SocketException
+	 */
 	public Client() throws SocketException{
-		System.setProperty( "file.encoding", "UTF-8" );
 		dgSocket = new DatagramSocket();
 		this.quit = false;
 	}
 	
+	/**
+	 * Permet l'envoie d'un message
+	 * @param msg
+	 * @param address
+	 * @param port
+	 * @throws IOException
+	 */
 	private void send(String msg, InetAddress address, int port) throws IOException {
 		byte[] buffer = msg.getBytes();
 		dgPacket = new DatagramPacket(buffer, 0, buffer.length);
@@ -34,40 +45,64 @@ public class Client extends Thread{
 		dgSocket.send(dgPacket);
 	}
 	
+	/**
+	 * Recupere la valeur de quit
+	 * @return
+	 */
 	private boolean getQuit(){
 		return quit;
 	}
 	
+	/**
+	 * Recupere une liste de fichiers
+	 * @return
+	 */
 	private ListeFichiers getList(){
 		return list;
 	}
 	
+	/**
+	 * Fait une pause d'une seconde
+	 * @throws InterruptedException
+	 */
 	private void pause() throws InterruptedException{
 			Thread.sleep(100);
 	}
 	
+	/**
+	 * Recupere la valeur de dgSocket
+	 * @return
+	 */
 	public DatagramSocket getDgSocket() {
 		return dgSocket;
 	}
 
+	/**
+	 * Recupere la valeur de dgPacket
+	 * @return
+	 */
 	public DatagramPacket getDgPacket() {
 		return dgPacket;
 	}
-
-	public void setDgSocket(DatagramSocket dgSocket) {
-		this.dgSocket = dgSocket;
-	}
-
-	public void setDgPacket(DatagramPacket dgPacket) {
-		this.dgPacket = dgPacket;
-	}
 	
+
+	/**
+	 * Retourne le message
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 */
 	public void verifOk() throws UnknownHostException, IOException{
 		send(pseudo, InetAddress.getByName(address), 5001);
 	}
+	
+	/**
+	 * Verifie la non presence de caracteres speciaux
+	 * @param pseudo
+	 * @return
+	 */
 	private boolean charSpeciaux(String pseudo){
 		boolean containt = false;
-		String cs = "[^\\wàâäÄÀÂéèêëÈÊËìîïÌÏÎòöôÒÖÔùüûÙÜÛç!#$€%&'`(),;:/@...]";
+		String cs = "[^\\wÃ Ã¢Ã¤Ã„Ã€Ã‚Ã©Ã¨ÃªÃ«ÃˆÃŠÃ‹Ã¬Ã®Ã¯ÃŒÃ�ÃŽÃ²Ã¶Ã´Ã’Ã–Ã”Ã¹Ã¼Ã»Ã™ÃœÃ›Ã§!#$â‚¬%&'`(),;:/@...]";
 		for(int i = 0; i < cs.length(); i++){
 			if(pseudo.indexOf(cs.charAt(i)) != -1){
 				containt = true;
@@ -77,6 +112,14 @@ public class Client extends Thread{
 		return containt;
 	}
 	
+	/**
+	 * Demande d'enregistrement avec un pseudo lors de la connexion
+	 * @param sc
+	 * @param notif
+	 * @param address
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	private void enregistrer(Scanner sc, Notification notif, InetAddress address) throws IOException, InterruptedException{
 		System.out.println("Bonjours ! Veuillez donner un pseudo : ");
 		String msg = "RGTR";
@@ -97,6 +140,13 @@ public class Client extends Thread{
 		}
 	}
 	
+	/**
+	 * Demande le chemin du dossier de partage lors de la connexion
+	 * @param sc
+	 * @param address
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
 	private void CDP(Scanner sc, InetAddress address) throws InterruptedException, IOException{
 		String msg = "CDP:"+ pseudo;
 		System.out.println("Ou se situe votre dossier de partage : ");
@@ -105,6 +155,14 @@ public class Client extends Thread{
 		envoieListFichier(this, msg, address);
 	}
 	
+	/**
+	 * Envoie la liste des fichiers
+	 * @param client
+	 * @param msg
+	 * @param address
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
 	private void envoieListFichier(Client client, String msg, InetAddress address) throws InterruptedException, IOException{
 		String [] tab = list.getTab();
 		msg = msg + ":";
@@ -122,6 +180,14 @@ public class Client extends Thread{
 		client.pause();
 	}
 	
+	/**
+	 * Demande la liste des utilisateurs sauf notre pseudo
+	 * @param msg
+	 * @param notif
+	 * @param address
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	private void list(String msg, Notification notif, InetAddress address) throws IOException, InterruptedException{
 		String[] words = msg.split(":");
 		if(words.length == 2){
@@ -134,6 +200,14 @@ public class Client extends Thread{
 		}
 	}
 	
+	/**
+	 * Gere les commandes non referencee
+	 * @param msg
+	 * @param notif
+	 * @param address
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	private void autres(String msg, Notification notif, InetAddress address) throws IOException, InterruptedException{
 		msg = msg + ":" + pseudo;
 		this.send(msg.length()+"", address, 5001);
@@ -141,6 +215,14 @@ public class Client extends Thread{
 		this.pause();
 	}
 	
+	/**
+	 * Signale la deconnexion
+	 * @param msg
+	 * @param notif
+	 * @param address
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	private void quit(String msg, Notification notif, InetAddress address) throws IOException, InterruptedException{
 		msg = msg + ":" + pseudo;
 		quit = true;
@@ -149,6 +231,14 @@ public class Client extends Thread{
 		this.pause();
 	}
 	
+	/**
+	 * Permet de recuperer le fichier
+	 * @param msg
+	 * @param notif
+	 * @param address
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	private void recup(String msg, Notification notif, InetAddress address) throws IOException, InterruptedException{
 		String [] words = msg.split(":");
 		String message = "INFO:" + words[1];
@@ -200,10 +290,18 @@ public class Client extends Thread{
 		}
 	}
 
+	/**
+	 * Recupere la valeur de address
+	 * @return
+	 */
 	public String getAddress() {
 		return address;
 	}
 
+	/**
+	 * Permet de modifier la valeur de address
+	 * @param address
+	 */
 	public void setAddress(String address) {
 		this.address = address;
 	}
